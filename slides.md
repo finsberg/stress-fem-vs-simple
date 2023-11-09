@@ -1,7 +1,7 @@
 ---
 theme: default
 paginate: true
-header: 'From the Law of Laplace to FEM'
+header: 'From the Law of Laplace to FEM-based stress estimation'
 footer: 'Work-seminar 30.11.23 - Henrik Finsberg'
 size: 16:9
 style: |
@@ -12,7 +12,7 @@ html: true
 marp: true
 ---
 
-# From the Law of Laplace to FEM
+# From the Law of Laplace to FEM-based stress estimation
 
 Henrik Finsberg
 Work seminar
