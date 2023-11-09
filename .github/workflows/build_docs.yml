@@ -37,6 +37,9 @@ jobs:
 
       - name: Build slides
         run: npx @marp-team/marp-cli slides.md --html -o ${{ env.PUBLISH_DIR }}/index.html
+      
+      - name: Copy figures
+        run: cp -r figures ${{ env.PUBLISH_DIR }}/.
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
