@@ -1,8 +1,21 @@
 from pathlib import Path
+from typing import NamedTuple
 import cardiac_geometries
 import ldrb
 import dolfin
 import math
+
+
+class EllipsoidRadius(NamedTuple):
+    short: float
+    long: float
+
+    @property
+    def ratio(self) -> int:
+        return int(self.long / self.short)
+
+    def __str__(self) -> str:
+        return f"{self.ratio}:1"
 
 
 def get_sphere_geometry(
@@ -74,6 +87,39 @@ def get_sphere_geometry(
     return geo
 
 
+def get_ellipsoid_geometry(
+    radius: EllipsoidRadius,
+    width: float,
+    psize_ref=0.1,
+):
+    folder = (
+        Path("ellipsoids")
+        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}_psize{psize_ref}"
+    )
+
+    if not folder.is_dir():
+        # Create geometry
+        cardiac_geometries.create_lv_ellipsoid(
+            folder,
+            r_short_endo=radius.short,
+            r_short_epi=radius.short + width,
+            r_long_endo=radius.long,
+            r_long_epi=radius.long + width,
+            psize_ref=psize_ref,
+            mu_apex_endo=-math.pi,
+            mu_base_endo=-math.pi / 2,
+            mu_apex_epi=-math.pi,
+            mu_base_epi=-math.pi / 2,
+            create_fibers=True,
+            fiber_space="DG_1",
+            fiber_angle_endo=90,
+            fiber_angle_epi=-60,
+        )
+
+    return cardiac_geometries.geometry.Geometry.from_folder(folder)
+
+
 if __name__ == "__main__":
-    geo = get_sphere_geometry(radius=1.0, width=0.5, fiber=(0, 0))
-    breakpoint()
+    # geo = get_sphere_geometry(radius=1.0, width=0.5, fiber=(0, 0))
+    # breakpoint()
+    get_ellipsoid_geometry(radius_long=1.5, radius_short=0.5, width=0.3, psize_ref=0.2)

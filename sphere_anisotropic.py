@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from utils import laplace
+import plot
 
 import mechanics
 import pulse2
@@ -20,7 +21,7 @@ dolfin.parameters["form_compiler"]["optimize"] = True
 
 pressures = (0.0, 0.1, 0.2, 0.3, 0.4)
 widths = (0.1, 0.2, 0.3, 0.5)
-radii = (0.3, 0.5, 1.0, 1.5)
+radii = (0.25, 0.5, 1.0, 1.5)
 default_width = 0.5
 default_radius = 1.0
 psize_ref = 0.1
@@ -182,97 +183,6 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
     return data
 
 
-def _plot(
-    y, df_pressure, df_width, df_radius, postfix, extra_factor: float | None = None
-):
-    ax = df_pressure.sort_values(by="pressure").plot(
-        x="pressure",
-        y=y,
-    )
-    ax.plot(
-        pressures,
-        laplace(
-            pressure=np.array(pressures), radius=default_radius, width=default_width
-        ),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            pressures,
-            laplace(
-                pressure=np.array(pressures),
-                radius=default_radius,
-                width=default_width,
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$r={default_radius}$, $w={default_width}$")
-    plt.savefig(f"figures/sphere_pressure_{postfix}.png")
-
-    ax = df_width.sort_values(by="width").plot(
-        x="width",
-        y=y,
-    )
-    ax.plot(
-        widths,
-        laplace(pressure=0.3, radius=default_radius, width=np.array(widths)),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            widths,
-            laplace(
-                pressure=0.3,
-                radius=default_radius,
-                width=np.array(widths),
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$r={default_radius}$, $p=0.3$")
-
-    plt.savefig(f"figures/sphere_width_{postfix}.png")
-
-    ax = df_radius.sort_values(by="radius").plot(
-        x="radius",
-        y=y,
-    )
-    ax.plot(
-        radii,
-        laplace(pressure=0.3, radius=np.array(radii), width=default_width),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            radii,
-            laplace(
-                pressure=0.3,
-                radius=np.array(radii),
-                width=default_width,
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$w={default_width}$, $p=0.3$")
-    plt.savefig(f"figures/sphere_radius_{postfix}.png")
-
-
 def postprocess():
     outdir = Path("results_sphere_anisotropic")
 
@@ -294,15 +204,27 @@ def postprocess():
     df_width = df[(df["radius"] == default_radius) & (df["pressure"] == 0.3)]
     df_radius = df[(df["width"] == default_width) & (df["pressure"] == 0.3)]
 
-    _plot(
+    return plot.plot_stress_curves(
         df_pressure=df_pressure,
         df_width=df_width,
         df_radius=df_radius,
         y=["von mises", "fiber_stress"],
         postfix="anisotropic",
+        default_radius=default_radius,
+        default_width=default_width,
+        pressures=pressures,
+        widths=widths,
+        radii=radii,
+        pressure_labels=(f"{xi:.2f}" for xi in np.array(pressures) / max(pressures)),
+        width_labels=(f"{xi:.2f}" for xi in default_radius / np.array(widths)),
+        radius_labels=(f"{xi:.2f}" for xi in np.array(radii) / default_radius),
+        width_xlabel="radius / width",
+        radius_xlabel="radius / default radius",
+        pressure_xlabel="pressure / max pressure",
+        prefix="sphere",
     )
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     postprocess()

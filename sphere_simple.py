@@ -3,10 +3,9 @@ import ufl_legacy as ufl
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import matplotlib.pyplot as plt
 
-from utils import laplace
-import mechanics
+
+import plot
 from geometries import get_sphere_geometry
 
 
@@ -18,7 +17,7 @@ dolfin.parameters["form_compiler"]["optimize"] = True
 
 pressures = (0.0, 0.1, 0.2, 0.3, 0.4)
 widths = (0.1, 0.2, 0.3, 0.5)
-radii = (0.3, 0.5, 1.0, 1.5)
+radii = (0.25, 0.5, 1.0, 1.5)
 default_width = 0.5
 default_radius = 1.0
 psize_ref = 0.1
@@ -195,192 +194,70 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
     return data
 
 
-def plot_geo():
-    fig = plt.figure(figsize=(10, 6))
-
-    geo = get_sphere_geometry(
-        radius=default_radius, width=default_width, psize_ref=psize_ref
-    )
-    ax = fig.add_subplot(1, 2, 1, projection="3d")
-    ax.set_xlim(-2.0, 0)
-    ax.set_ylim(-2.0, 2.0)
-    ax.set_zlim(-2.0, 2.0)
-
-    dolfin.common.plotting.mplot_mesh(ax=ax, mesh=geo.mesh)
-    ax.azim = 0
-    ax.dist = 7
-    ax.elev = -20
-
-    ax = fig.add_subplot(1, 2, 2, projection="3d")
-    ax.set_xlim(-2.0, 0)
-    ax.set_ylim(-1.0, 2.5)
-    ax.set_zlim(-2.0, 1.5)
-
-    dolfin.common.plotting.mplot_mesh(ax=ax, mesh=geo.mesh)
-    ax.azim = -60
-    ax.dist = 7
-    ax.elev = 30
-    fig.savefig("figures/sphere_mesh_default.png", dpi=300)
-
-    fig = plt.figure(figsize=(12, 4))
-    for i, radius in enumerate(radii, start=1):
-        geo = get_sphere_geometry(
-            radius=radius, width=default_width, psize_ref=psize_ref
-        )
-        ax = fig.add_subplot(1, len(radii), i, projection="3d")
-        ax.set_xlim(-3.0, 0)
-        ax.set_ylim(-3.0, 3.0)
-        ax.set_zlim(-3.0, 3.0)
-
-        dolfin.common.plotting.mplot_mesh(ax=ax, mesh=geo.mesh)
-        ax.set_title(f"$r = {radius}$")
-        ax.azim = 0
-        ax.dist = 7
-        ax.elev = -20
-        if i > 0:
-            ax.set_yticks([])
-
-    fig.savefig("figures/sphere_mesh_radius.png", dpi=300)
-
-    fig = plt.figure(figsize=(12, 4))
-    for i, width in enumerate(widths, start=1):
-        geo = get_sphere_geometry(
-            radius=default_radius, width=width, psize_ref=psize_ref
-        )
-        ax = fig.add_subplot(1, len(radii), i, projection="3d")
-        ax.set_xlim(-3.0, 0)
-        ax.set_ylim(-3.0, 3.0)
-        ax.set_zlim(-3.0, 3.0)
-
-        dolfin.common.plotting.mplot_mesh(ax=ax, mesh=geo.mesh)
-        ax.set_title(f"$w = {width}$")
-        ax.azim = 0
-        ax.dist = 7
-        ax.elev = -20
-
-    fig.savefig("figures/sphere_mesh_width.png", dpi=300)
-
-
-def _plot(
-    y, df_pressure, df_width, df_radius, postfix, extra_factor: float | None = None
-):
-    ax = df_pressure.sort_values(by="pressure").plot(
-        x="pressure",
-        y=y,
-    )
-    ax.plot(
-        pressures,
-        laplace(
-            pressure=np.array(pressures), radius=default_radius, width=default_width
-        ),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            pressures,
-            laplace(
-                pressure=np.array(pressures),
-                radius=default_radius,
-                width=default_width,
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$r={default_radius}$, $w={default_width}$")
-    plt.savefig(f"figures/sphere_pressure_{postfix}.png")
-
-    ax = df_width.sort_values(by="width").plot(
-        x="width",
-        y=y,
-        marker="o",
-    )
-    ax.plot(
-        widths,
-        laplace(pressure=0.3, radius=default_radius, width=np.array(widths)),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            widths,
-            laplace(
-                pressure=0.3,
-                radius=default_radius,
-                width=np.array(widths),
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$r={default_radius}$, $p=0.3$")
-
-    plt.savefig(f"figures/sphere_width_{postfix}.png")
-
-    ax = df_radius.sort_values(by="radius").plot(
-        x="radius",
-        y=y,
-    )
-    ax.plot(
-        radii,
-        laplace(pressure=0.3, radius=np.array(radii), width=default_width),
-        "k--",
-        label="Laplace",
-    )
-    if extra_factor is not None:
-        ax.plot(
-            radii,
-            laplace(
-                pressure=0.3,
-                radius=np.array(radii),
-                width=default_width,
-                factor=extra_factor,
-            ),
-            "k:",
-            label=f"Laplace (factor={extra_factor})",
-        )
-    ax.legend()
-    ax.set_yticks([])
-    ax.set_ylabel("Stress")
-    ax.set_title(f"$w={default_width}$, $p=0.3$")
-    plt.savefig(f"figures/sphere_radius_{postfix}.png")
-
-
 def plot_von_mises_only(df_pressure, df_width, df_radius):
-    return _plot(
+    return plot.plot_stress_curves(
         df_pressure=df_pressure,
         df_width=df_width,
         df_radius=df_radius,
         y=["von mises"],
         postfix="von_mises_only",
+        default_radius=default_radius,
+        default_width=default_width,
+        pressures=pressures,
+        widths=widths,
+        radii=radii,
+        pressure_labels=(f"{xi:.2f}" for xi in np.array(pressures) / max(pressures)),
+        width_labels=(f"{xi:.2f}" for xi in default_radius / np.array(widths)),
+        radius_labels=(f"{xi:.2f}" for xi in np.array(radii) / default_radius),
+        prefix="sphere",
+        width_xlabel="radius / width",
+        radius_xlabel="radius / default radius",
+        pressure_xlabel="pressure / max pressure",
     )
 
 
 def plot_circ_and_von_mises(df_pressure, df_width, df_radius):
-    return _plot(
+    return plot.plot_stress_curves(
         df_pressure=df_pressure,
         df_width=df_width,
         df_radius=df_radius,
         y=["von mises", "circumferential"],
         postfix="circ",
         extra_factor=8,
+        default_radius=default_radius,
+        default_width=default_width,
+        pressures=pressures,
+        widths=widths,
+        radii=radii,
+        pressure_labels=(f"{xi:.2f}" for xi in np.array(pressures) / max(pressures)),
+        width_labels=(f"{xi:.2f}" for xi in default_radius / np.array(widths)),
+        radius_labels=(f"{xi:.2f}" for xi in np.array(radii) / default_radius),
+        width_xlabel="radius / width",
+        radius_xlabel="radius / default radius",
+        pressure_xlabel="pressure / max pressure",
+        prefix="sphere",
     )
 
 
 def plot_all(df_pressure, df_width, df_radius):
-    return _plot(
+    return plot.plot_stress_curves(
         df_pressure=df_pressure,
         df_width=df_width,
         df_radius=df_radius,
         y=["von mises", "circumferential", "(60, -60)", "(90, -60)"],
         postfix="all",
+        default_radius=default_radius,
+        default_width=default_width,
+        pressures=pressures,
+        widths=widths,
+        radii=radii,
+        pressure_labels=(f"{xi:.2f}" for xi in np.array(pressures) / max(pressures)),
+        width_labels=(f"{xi:.2f}" for xi in default_radius / np.array(widths)),
+        radius_labels=(f"{xi:.2f}" for xi in np.array(radii) / default_radius),
+        width_xlabel="radius / width",
+        radius_xlabel="radius / default radius",
+        pressure_xlabel="pressure / max pressure",
+        prefix="sphere",
     )
 
 
@@ -412,4 +289,10 @@ def postprocess():
 if __name__ == "__main__":
     # main()
     postprocess()
-    # plot_geo()
+    plot.plot_sphere_geo(
+        radii=radii,
+        widths=widths,
+        default_width=default_width,
+        default_radius=default_radius,
+        psize_ref=psize_ref,
+    )

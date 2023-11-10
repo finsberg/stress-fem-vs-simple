@@ -130,4 +130,8 @@ In the calculations so far we have assumed that the heart is linear elastic, iso
 
 ## The left ventricle is not a sphere
 
+A better (and more common) approximation would be to approximate the LV as an ellipsoids. 
+Here showing an ellipsoid with ratio 3:1 with long to short axis
 
+
+![bg right:40% fit](figures/ellipsoid_mesh_default.png)
