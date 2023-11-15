@@ -1,3 +1,6 @@
 cardiac-geometries
 pandas
 git+https://github.com/finsberg/pulse2.git
+fenics-plotly
+kaleido
+nbformat

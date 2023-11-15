@@ -3,6 +3,7 @@ results_*
 .DS_Store
 slides.html
 spheres/
+ellipsoids/
 third_party/
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode

@@ -5,12 +5,13 @@ import numpy as np
 from pathlib import Path
 import matplotlib.pyplot as plt
 
+
 from utils import laplace
 import plot
 
 import mechanics
 import pulse2
-from geometries import get_sphere_geometry
+from geometries import get_ellipsoid_geometry, EllipsoidRadius
 
 
 dolfin.parameters["form_compiler"]["quadrature_degree"] = 6
@@ -20,10 +21,15 @@ dolfin.parameters["form_compiler"]["optimize"] = True
 
 
 pressures = (0.0, 0.1, 0.2, 0.3, 0.4)
-widths = (0.1, 0.2, 0.3, 0.5)
-radii = (0.25, 0.5, 1.0, 1.5)
-default_width = 0.5
-default_radius = 1.0
+widths = (0.1, 0.25, 0.5)
+radii = (
+    EllipsoidRadius(short=0.5, long=0.5),
+    EllipsoidRadius(short=0.5, long=1.0),
+    EllipsoidRadius(short=0.5, long=1.5),
+    EllipsoidRadius(short=0.5, long=2.5),
+)
+default_width = 0.25
+default_radius = EllipsoidRadius(short=0.5, long=1.5)
 psize_ref = 0.1
 
 
@@ -33,9 +39,9 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         markers=geo.markers,
         ffun=geo.ffun,
         cfun=geo.cfun,
-        f0=geo.fiber["90-60"]["f0"],
-        s0=geo.fiber["90-60"]["s0"],
-        n0=geo.fiber["90-60"]["n0"],
+        f0=geo.f0,
+        s0=geo.s0,
+        n0=geo.n0,
     )
 
     material_params = pulse2.HolzapfelOgden.transversely_isotropic_parameters()
@@ -55,7 +61,6 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
     )
 
     # Compute solution
-
     W = dolfin.FunctionSpace(geo.mesh, "DG", 1)
 
     for i, pi in enumerate(pressures):
@@ -95,18 +100,19 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
 
 
 def main():
-    psize_ref = 0.1
-    outdir = Path("results_sphere_anisotropic")
+    outdir = Path("results_ellipsoid")
 
     for radius in radii:
-        print(f"{radius = }")
-        geo = get_sphere_geometry(
+        print(radius)
+        geo = get_ellipsoid_geometry(
             radius=radius,
             width=default_width,
             psize_ref=psize_ref,
-            fiber={"90-60": (90, -60)},
         )
-        output = outdir / f"radius{radius}_width{default_width}_psize{psize_ref}.xdmf"
+        output = (
+            outdir
+            / f"radius_long{radius.long}_radius_short{radius.short}_width{default_width}_psize{psize_ref}.xdmf"
+        )
         if output.is_file():
             continue
         solve(
@@ -116,14 +122,16 @@ def main():
         )
 
     for width in widths:
-        print(f"{width =}")
-        geo = get_sphere_geometry(
+        print(width)
+        geo = get_ellipsoid_geometry(
             radius=default_radius,
             width=width,
             psize_ref=psize_ref,
-            fiber={"90-60": (90, -60)},
         )
-        output = outdir / f"radius{default_radius}_width{width}_psize{psize_ref}.xdmf"
+        output = (
+            outdir
+            / f"radius_long{default_radius.long}_radius_short{default_radius.short}_width{width}_psize{psize_ref}.xdmf"
+        )
         if output.is_file():
             continue
         solve(
@@ -134,11 +142,10 @@ def main():
 
 
 def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
-    geo = get_sphere_geometry(
+    geo = get_ellipsoid_geometry(
         radius=radius,
         width=width,
         psize_ref=psize_ref,
-        fiber={"90-60": (90, -60)},
     )
     V = dolfin.FunctionSpace(geo.mesh, "DG", 1)
     von_Mises = dolfin.Function(V)
@@ -158,11 +165,15 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
     # epiarea = dolfin.assemble(dolfin.Constant(1.0) * dsepi)
     volume = dolfin.assemble(dolfin.Constant(1.0) * dx)
 
-    output = outdir / f"radius{radius}_width{width}_psize{psize_ref}.xdmf"
+    output = (
+        outdir
+        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}_psize{psize_ref}.xdmf"
+    )
     if not output.is_file():
         return []
 
     data = []
+
     with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
         for i, p in enumerate(pressures):
             xdmf.read_checkpoint(von_Mises, "von_Mises", i)
@@ -173,7 +184,9 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
 
             data.append(
                 {
-                    "radius": radius,
+                    "radius": radius.ratio,
+                    "radius_long": radius.long,
+                    "radius_short": radius.short,
                     "pressure": p,
                     "width": width,
                     "von mises": avg_von_mises,
@@ -184,15 +197,15 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
 
 
 def postprocess():
-    outdir = Path("results_sphere_anisotropic")
+    outdir = Path("results_ellipsoid")
 
     data = []
     for radius in radii:
-        print(f"{radius= }")
+        print(radius)
         data.extend(postprocess_item(radius=radius, width=default_width, outdir=outdir))
 
     for width in widths:
-        print(f"{width = }")
+        print(width)
         if width == default_width:
             # Already covered above
             continue
@@ -200,8 +213,10 @@ def postprocess():
 
     df = pd.DataFrame(data)
 
-    df_pressure = df[(df["radius"] == default_radius) & (df["width"] == default_width)]
-    df_width = df[(df["radius"] == default_radius) & (df["pressure"] == 0.3)]
+    df_pressure = df[
+        (df["radius"] == default_radius.ratio) & (df["width"] == default_width)
+    ]
+    df_width = df[(df["radius"] == default_radius.ratio) & (df["pressure"] == 0.3)]
     df_radius = df[(df["width"] == default_width) & (df["pressure"] == 0.3)]
 
     return plot.plot_stress_curves(
@@ -217,15 +232,29 @@ def postprocess():
         widths=widths,
         radii=radii,
         pressure_labels=(f"{xi:.2f}" for xi in np.array(pressures) / max(pressures)),
-        width_labels=(f"{xi:.2f}" for xi in default_radius / np.array(widths)),
-        radius_labels=(f"{xi:.2f}" for xi in np.array(radii) / default_radius),
-        width_xlabel="radius / width",
-        radius_xlabel="radius / default radius",
+        width_labels=(f"{xi:.2f}" for xi in default_radius.short / np.array(widths)),
+        radius_labels=(f"{xi:.2f}" for xi in np.array([r.ratio for r in radii])),
+        width_xlabel="radius short / width",
+        radius_xlabel="radius ratio long : short",
         pressure_xlabel="pressure / max pressure",
-        prefix="sphere",
+        prefix="ellipsoid",
     )
 
 
 if __name__ == "__main__":
     # main()
-    postprocess()
+    # postprocess()
+
+    # plot.plot_ellipsoid_geo(
+    #     radii=radii,
+    #     widths=widths,
+    #     default_width=default_width,
+    #     default_radius=default_radius,
+    #     psize_ref=psize_ref,
+    # )
+
+    plot.plot_aha(
+        default_width=default_width,
+        default_radius=default_radius,
+        psize_ref=psize_ref,
+    )

@@ -35,6 +35,10 @@ $$
 \text{ws} = \frac{p \times r}{2 \times w}
 $$
 
+<p class="small-text">
+Woods, Robert H. "A few applications of a physical theorem to membranes in the human body in a state of tension." Journal of anatomy and physiology 26.Pt 3 (1892): 362.
+</p>
+
 ![bg right fit](figures/laplace.jpg)
 
 ---
@@ -43,31 +47,29 @@ $$
 
 ![w:700 right](figures/sphere_stress_default.png)
 
-Here using $r = 1$, $w = 1$ and $p = 0.4$ in which case $\text{ws} = 0.4$
+---
+
+<!-- <style scoped>section { justify-content: start; }</style> -->
+We can also test this law using different radii
+
+<!-- By average the stress over the entire geometry -->
+
+![bg contain vertical](figures/sphere_mesh_radius.png)
+![bg fit](figures/sphere_radius_von_mises_only.png)
 
 ---
 
-# We can also test this law using different radii
+With different widths
 
-By average the stress over the entire geometry
-
-![w:900 center](figures/sphere_mesh_radius.png)
-![bg right:35% fit](figures/sphere_radius_von_mises_only.png)
-
----
-
-
-# With different widths
-
-![w:900 center](figures/sphere_mesh_width.png)
-![bg right:35% fit](figures/sphere_width_von_mises_only.png)
+![bg contain vertical](figures/sphere_mesh_width.png)
+![bg fit](figures/sphere_width_von_mises_only.png)
 
 
 ---
 
-# Or with different pressures
+Or with different pressures
 
-![bg right:35% fit](figures/sphere_pressure_von_mises_only.png)
+![bg right:65% fit](figures/sphere_pressure_von_mises_only.png)
 * But let us try to make our spherical ventricle a bit more realistic
 
 
@@ -130,8 +132,40 @@ In the calculations so far we have assumed that the heart is linear elastic, iso
 
 ## The left ventricle is not a sphere
 
-A better (and more common) approximation would be to approximate the LV as an ellipsoids. 
-Here showing an ellipsoid with ratio 3:1 with long to short axis
+![w:900 center](figures/geometries.png)
 
+
+---
+
+We can redo the analysis using ellipsoids with different widths and ratios between the short and long axis
 
 ![bg right:40% fit](figures/ellipsoid_mesh_default.png)
+
+
+---
+
+<!-- <style scoped>section { justify-content: start; }</style> -->
+We fix the radius along the short axis and vary the width and the long axis radius
+
+
+![bg fit vertical](figures/ellipsoid_mesh_radius.png)
+![bg fit](figures/ellipsoid_mesh_width.png)
+
+---
+
+<style scoped>section { justify-content: start; }</style>
+## Using an anisotropic material model and an ellipsoidal geometry
+
+![bg fit](figures/ellipsoid_pressure_anisotropic.png)
+![bg fit](figures/ellipsoid_radius_anisotropic.png)
+![bg fit](figures/ellipsoid_width_anisotropic.png)
+
+
+---
+
+## With FEM-based models we can alo compute the stresses in each AHA segment
+
+![bg fit right](figures/ellipsoid_mesh_aha.png)
+
+---
+

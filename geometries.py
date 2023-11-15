@@ -115,8 +115,11 @@ def get_ellipsoid_geometry(
             fiber_angle_endo=90,
             fiber_angle_epi=-60,
         )
-
-    return cardiac_geometries.geometry.Geometry.from_folder(folder)
+    schema = cardiac_geometries.geometry.Geometry.default_schema()
+    cfun = schema["cfun"]._asdict()
+    cfun["fname"] = "cfun.xdmf"
+    schema["cfun"] = cardiac_geometries.geometry.H5Path(**cfun)
+    return cardiac_geometries.geometry.Geometry.from_folder(folder, schema=schema)
 
 
 if __name__ == "__main__":

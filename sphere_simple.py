@@ -203,6 +203,7 @@ def plot_von_mises_only(df_pressure, df_width, df_radius):
         postfix="von_mises_only",
         default_radius=default_radius,
         default_width=default_width,
+        default_pressure=0.3,
         pressures=pressures,
         widths=widths,
         radii=radii,
@@ -226,6 +227,7 @@ def plot_circ_and_von_mises(df_pressure, df_width, df_radius):
         extra_factor=8,
         default_radius=default_radius,
         default_width=default_width,
+        default_pressure=0.3,
         pressures=pressures,
         widths=widths,
         radii=radii,
@@ -248,6 +250,7 @@ def plot_all(df_pressure, df_width, df_radius):
         postfix="all",
         default_radius=default_radius,
         default_width=default_width,
+        default_pressure=0.3,
         pressures=pressures,
         widths=widths,
         radii=radii,
@@ -288,7 +291,7 @@ def postprocess():
 
 if __name__ == "__main__":
     # main()
-    postprocess()
+    # postprocess()
     plot.plot_sphere_geo(
         radii=radii,
         widths=widths,

@@ -1,10 +1,11 @@
 import numpy as np
+from typing import Iterable
 
 
 def laplace(
-    pressure: float | np.ndarray,
-    radius: float | np.ndarray,
-    width: float | np.ndarray,
+    pressure: float | Iterable,
+    radius: float | Iterable,
+    width: float | Iterable,
     factor=2.0,
 ) -> float | np.ndarray:
-    return pressure * radius / (factor * width)
+    return np.array(pressure) * np.array(radius) / (factor * np.array(width))
