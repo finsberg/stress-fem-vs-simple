@@ -30,7 +30,6 @@ radii = (
 )
 default_width = 0.25
 default_radius = EllipsoidRadius(short=0.5, long=1.5)
-psize_ref = 0.1
 
 
 def solve(geo, pressures: tuple[float, ...], output: Path | str):
@@ -57,7 +56,9 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         compressibility=comp_model,
     )
     problem = pulse2.LVProblem(
-        model=model, geometry=geo, parameters={"bc_type": "fix_base"}
+        model=model,
+        geometry=geo,
+        parameters={"bc_type": "fix_base"},
     )
 
     # Compute solution
@@ -88,7 +89,11 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
             xdmf.write_checkpoint(u, "u", float(i), dolfin.XDMFFile.Encoding.HDF5, True)
             xdmf.write_checkpoint(
-                von_Mises, "von_Mises", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                von_Mises,
+                "von_Mises",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
             xdmf.write_checkpoint(
                 fiber_stress,
@@ -107,11 +112,10 @@ def main():
         geo = get_ellipsoid_geometry(
             radius=radius,
             width=default_width,
-            psize_ref=psize_ref,
         )
         output = (
             outdir
-            / f"radius_long{radius.long}_radius_short{radius.short}_width{default_width}_psize{psize_ref}.xdmf"
+            / f"radius_long{radius.long}_radius_short{radius.short}_width{default_width}.xdmf"
         )
         if output.is_file():
             continue
@@ -126,11 +130,10 @@ def main():
         geo = get_ellipsoid_geometry(
             radius=default_radius,
             width=width,
-            psize_ref=psize_ref,
         )
         output = (
             outdir
-            / f"radius_long{default_radius.long}_radius_short{default_radius.short}_width{width}_psize{psize_ref}.xdmf"
+            / f"radius_long{default_radius.long}_radius_short{default_radius.short}_width{width}.xdmf"
         )
         if output.is_file():
             continue
@@ -141,33 +144,20 @@ def main():
         )
 
 
-def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
+def postprocess_item(radius, width, outdir):
     geo = get_ellipsoid_geometry(
         radius=radius,
         width=width,
-        psize_ref=psize_ref,
     )
     V = dolfin.FunctionSpace(geo.mesh, "DG", 1)
     von_Mises = dolfin.Function(V)
     Tf = dolfin.Function(V)
-
-    # dsendo = ufl.ds(
-    #     subdomain_data=geo.ffun,
-    #     domain=geo.mesh,
-    #     subdomain_id=geo.markers["ENDO"][0],
-    # )
-    # dsepi = ufl.ds(
-    #     subdomain_data=geo.ffun, domain=geo.mesh, subdomain_id=geo.markers["EPI"][0]
-    # )
     dx = ufl.dx(domain=geo.mesh)
-
-    # endoarea = dolfin.assemble(dolfin.Constant(1.0) * dsendo)
-    # epiarea = dolfin.assemble(dolfin.Constant(1.0) * dsepi)
     volume = dolfin.assemble(dolfin.Constant(1.0) * dx)
 
     output = (
         outdir
-        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}_psize{psize_ref}.xdmf"
+        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}.xdmf"
     )
     if not output.is_file():
         return []
@@ -191,7 +181,7 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
                     "width": width,
                     "von mises": avg_von_mises,
                     "fiber_stress": avg_Tf,
-                }
+                },
             )
     return data
 
@@ -242,19 +232,16 @@ def postprocess():
 
 
 if __name__ == "__main__":
-    # main()
-    # postprocess()
+    main()
+    postprocess()
 
-    # plot.plot_ellipsoid_geo(
-    #     radii=radii,
-    #     widths=widths,
-    #     default_width=default_width,
-    #     default_radius=default_radius,
-    #     psize_ref=psize_ref,
-    # )
-
+    plot.plot_ellipsoid_geo(
+        radii=radii,
+        widths=widths,
+        default_width=default_width,
+        default_radius=default_radius,
+    )
     plot.plot_aha(
         default_width=default_width,
         default_radius=default_radius,
-        psize_ref=psize_ref,
     )

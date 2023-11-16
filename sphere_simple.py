@@ -20,7 +20,6 @@ widths = (0.1, 0.2, 0.3, 0.5)
 radii = (0.25, 0.5, 1.0, 1.5)
 default_width = 0.5
 default_radius = 1.0
-psize_ref = 0.1
 
 
 def solve(geo, pressures: tuple[float, ...], output: Path | str):
@@ -32,7 +31,10 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
     V = dolfin.VectorFunctionSpace(geo.mesh, "P", 1)
     # Fix base
     bcs = dolfin.DirichletBC(
-        V, dolfin.Constant((0, 0, 0)), geo.ffun, geo.markers["BASE"][0]
+        V,
+        dolfin.Constant((0, 0, 0)),
+        geo.ffun,
+        geo.markers["BASE"][0],
     )
 
     # Define strain and stress
@@ -56,7 +58,8 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
 
     a = ufl.inner(sigma(u), epsilon(v)) * ufl.dx
     L = ufl.dot(-pressure * N, v) * ufl.ds(
-        subdomain_data=geo.ffun, subdomain_id=geo.markers["ENDO"][0]
+        subdomain_data=geo.ffun,
+        subdomain_id=geo.markers["ENDO"][0],
     )
 
     # Compute solution
@@ -69,7 +72,7 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
 
         # Plot stress
         s = sigma(u) - (1.0 / 3) * ufl.tr(sigma(u)) * ufl.Identity(
-            d
+            d,
         )  # deviatoric stress
         von_Mises = dolfin.project(ufl.sqrt(3.0 / 2 * ufl.inner(s, s)), W)
 
@@ -84,21 +87,36 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
             xdmf.write_checkpoint(u, "u", float(i), dolfin.XDMFFile.Encoding.HDF5, True)
             xdmf.write_checkpoint(
-                von_Mises, "von_Mises", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                von_Mises,
+                "von_Mises",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
             xdmf.write_checkpoint(
-                circ, "circ", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                circ,
+                "circ",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
             xdmf.write_checkpoint(
-                f6060, "f6060", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                f6060,
+                "f6060",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
             xdmf.write_checkpoint(
-                f9060, "f9060", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                f9060,
+                "f9060",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
 
 
 def main():
-    psize_ref = 0.1
     outdir = Path("results_sphere_simple")
 
     for radius in radii:
@@ -106,10 +124,9 @@ def main():
         geo = get_sphere_geometry(
             radius=radius,
             width=default_width,
-            psize_ref=psize_ref,
             fiber={"0-0": (0, 0), "60-60": (60, -60), "90-60": (90, -60)},
         )
-        output = outdir / f"radius{radius}_width{default_width}_psize{psize_ref}.xdmf"
+        output = outdir / f"radius{radius}_width{default_width}.xdmf"
         if output.is_file():
             continue
         solve(
@@ -123,10 +140,9 @@ def main():
         geo = get_sphere_geometry(
             radius=default_radius,
             width=width,
-            psize_ref=psize_ref,
             fiber={"0-0": (0, 0), "60-60": (60, -60), "90-60": (90, -60)},
         )
-        output = outdir / f"radius{default_radius}_width{width}_psize{psize_ref}.xdmf"
+        output = outdir / f"radius{default_radius}_width{width}.xdmf"
         if output.is_file():
             continue
         solve(
@@ -136,11 +152,10 @@ def main():
         )
 
 
-def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
+def postprocess_item(radius, width, outdir):
     geo = get_sphere_geometry(
         radius=radius,
         width=width,
-        psize_ref=psize_ref,
         fiber={"0-0": (0, 0), "60-60": (60, -60), "90-60": (90, -60)},
     )
     V = dolfin.FunctionSpace(geo.mesh, "DG", 0)
@@ -162,7 +177,7 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
     # epiarea = dolfin.assemble(dolfin.Constant(1.0) * dsepi)
     volume = dolfin.assemble(dolfin.Constant(1.0) * dx)
 
-    output = outdir / f"radius{radius}_width{width}_psize{psize_ref}.xdmf"
+    output = outdir / f"radius{radius}_width{width}.xdmf"
     if not output.is_file():
         return []
 
@@ -189,7 +204,7 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
                     "circumferential": avg_circ,
                     "(60, -60)": avg_f6060,
                     "(90, -60)": avg_f9060,
-                }
+                },
             )
     return data
 
@@ -290,12 +305,11 @@ def postprocess():
 
 
 if __name__ == "__main__":
-    # main()
-    # postprocess()
+    main()
+    postprocess()
     plot.plot_sphere_geo(
         radii=radii,
         widths=widths,
         default_width=default_width,
         default_radius=default_radius,
-        psize_ref=psize_ref,
     )

@@ -18,11 +18,9 @@ class EllipsoidRadius(NamedTuple):
         return f"{self.ratio}:1"
 
 
-def get_sphere_geometry(
-    radius, width, psize_ref=0.1, fiber: dict[str, tuple[int, int]] | None = None
-):
-    folder = Path("spheres") / f"radius{radius}_width{width}_psize{psize_ref}"
-
+def get_sphere_geometry(radius, width, fiber: dict[str, tuple[int, int]] | None = None):
+    folder = Path("spheres") / f"radius{radius}_width{width}"
+    psize_ref = radius / 3
     if not folder.is_dir():
         # Create geometry
         cardiac_geometries.create_lv_ellipsoid(
@@ -90,13 +88,12 @@ def get_sphere_geometry(
 def get_ellipsoid_geometry(
     radius: EllipsoidRadius,
     width: float,
-    psize_ref=0.1,
 ):
     folder = (
         Path("ellipsoids")
-        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}_psize{psize_ref}"
+        / f"radius_long{radius.long}_radius_short{radius.short}_width{width}"
     )
-
+    psize_ref = radius.long / 8
     if not folder.is_dir():
         # Create geometry
         cardiac_geometries.create_lv_ellipsoid(
@@ -125,4 +122,4 @@ def get_ellipsoid_geometry(
 if __name__ == "__main__":
     # geo = get_sphere_geometry(radius=1.0, width=0.5, fiber=(0, 0))
     # breakpoint()
-    get_ellipsoid_geometry(radius_long=1.5, radius_short=0.5, width=0.3, psize_ref=0.2)
+    get_ellipsoid_geometry(radius_long=1.5, radius_short=0.5, width=0.3)

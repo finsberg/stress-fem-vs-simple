@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Use Node v18
         uses: actions/setup-node@v4
         with:
@@ -37,7 +37,7 @@ jobs:
 
       - name: Build slides
         run: npx @marp-team/marp-cli slides.md --html -o ${{ env.PUBLISH_DIR }}/index.html
-      
+
       - name: Copy figures
         run: cp -r figures ${{ env.PUBLISH_DIR }}/.
 

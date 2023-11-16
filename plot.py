@@ -19,13 +19,10 @@ def plot_sphere_geo(
     widths,
     default_width,
     default_radius,
-    psize_ref,
 ):
     fig = plt.figure(figsize=(10, 6))
 
-    geo = get_sphere_geometry(
-        radius=default_radius, width=default_width, psize_ref=psize_ref
-    )
+    geo = get_sphere_geometry(radius=default_radius, width=default_width)
     ax = fig.add_subplot(1, 2, 1, projection="3d")
     ax.set_xlim(-2.0, 0)
     ax.set_ylim(-2.0, 2.0)
@@ -51,9 +48,7 @@ def plot_sphere_geo(
 
     fig = plt.figure(figsize=(12, 4))
     for i, radius in enumerate(radii, start=1):
-        geo = get_sphere_geometry(
-            radius=radius, width=default_width, psize_ref=psize_ref
-        )
+        geo = get_sphere_geometry(radius=radius, width=default_width)
         ax = fig.add_subplot(1, len(radii), i, projection="3d")
         ax.set_xlim(-3.0, 0)
         ax.set_ylim(-2.5, 2.5)
@@ -74,9 +69,7 @@ def plot_sphere_geo(
 
     fig = plt.figure(figsize=(12, 4))
     for i, width in enumerate(widths, start=1):
-        geo = get_sphere_geometry(
-            radius=default_radius, width=width, psize_ref=psize_ref
-        )
+        geo = get_sphere_geometry(radius=default_radius, width=width)
         ax = fig.add_subplot(1, len(radii), i, projection="3d")
         ax.set_xlim(-3.0, 0)
         ax.set_ylim(-2.5, 2.5)
@@ -101,13 +94,10 @@ def plot_ellipsoid_geo(
     widths,
     default_width,
     default_radius,
-    psize_ref,
 ):
     fig = plt.figure(figsize=(10, 6))
 
-    geo = get_ellipsoid_geometry(
-        radius=default_radius, width=default_width, psize_ref=psize_ref
-    )
+    geo = get_ellipsoid_geometry(radius=default_radius, width=default_width)
     ax = fig.add_subplot(1, 2, 1, projection="3d")
     ax.set_xlim(-2.0, 0)
     ax.set_ylim(-1.5, 1.5)
@@ -133,9 +123,7 @@ def plot_ellipsoid_geo(
 
     fig = plt.figure(figsize=(12, 4))
     for i, radius in enumerate(radii, start=1):
-        geo = get_ellipsoid_geometry(
-            radius=radius, width=default_width, psize_ref=psize_ref
-        )
+        geo = get_ellipsoid_geometry(radius=radius, width=default_width)
         ax = fig.add_subplot(1, len(radii), i, projection="3d")
         ax.set_xlim(-1.5, 0)
         ax.set_ylim(-1.5, 1.5)
@@ -156,9 +144,7 @@ def plot_ellipsoid_geo(
 
     fig = plt.figure(figsize=(12, 4))
     for i, width in enumerate(widths, start=1):
-        geo = get_ellipsoid_geometry(
-            radius=default_radius, width=width, psize_ref=psize_ref
-        )
+        geo = get_ellipsoid_geometry(radius=default_radius, width=width)
         ax = fig.add_subplot(1, len(widths), i, projection="3d")
         ax.set_xlim(-1.5, 0)
         ax.set_ylim(-1.5, 1.5)
@@ -178,14 +164,12 @@ def plot_ellipsoid_geo(
     fig.savefig("figures/ellipsoid_mesh_width.png", dpi=300)
 
 
-def plot_aha(default_radius, default_width, psize_ref):
+def plot_aha(default_radius, default_width):
     import fenics_plotly
 
     fenics_plotly.set_renderer("png")
 
-    geo = get_ellipsoid_geometry(
-        radius=default_radius, width=default_width, psize_ref=psize_ref
-    )
+    geo = get_ellipsoid_geometry(radius=default_radius, width=default_width)
 
     fig = fenics_plotly.plot(geo.cfun)
     fig.figure.write_image("figures/ellipsoid_mesh_aha.png")

@@ -58,7 +58,7 @@ def transverse_holzapfel_ogden(
         = \frac{a}{2 b} \left( e^{ b (I_1 - 3)}  -1 \right)
         + \frac{a_f}{2 b_f} \mathcal{H}(I_{4\mathbf{f}_0} - 1)
         \left( e^{ b_f (I_{4\mathbf{f}_0} - 1)_+^2} -1 \right)
-       
+
     where
     .. math::
         (x)_+ = \max\{x,0\}
@@ -105,7 +105,9 @@ def transverse_holzapfel_ogden(
 
 
 def active_stress_energy(
-    F: ufl.Coefficient, f0: dolfin.Function, Ta: dolfin.Constant
+    F: ufl.Coefficient,
+    f0: dolfin.Function,
+    Ta: dolfin.Constant,
 ) -> ufl.Coefficient:
     """Active stress energy
     Parameters

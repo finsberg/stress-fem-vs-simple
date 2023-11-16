@@ -168,4 +168,3 @@ We fix the radius along the short axis and vary the width and the long axis radi
 ![bg fit right](figures/ellipsoid_mesh_aha.png)
 
 ---
-

@@ -24,7 +24,6 @@ widths = (0.1, 0.2, 0.3, 0.5)
 radii = (0.25, 0.5, 1.0, 1.5)
 default_width = 0.5
 default_radius = 1.0
-psize_ref = 0.1
 
 
 def solve(geo, pressures: tuple[float, ...], output: Path | str):
@@ -51,7 +50,9 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         compressibility=comp_model,
     )
     problem = pulse2.LVProblem(
-        model=model, geometry=geo, parameters={"bc_type": "fix_base"}
+        model=model,
+        geometry=geo,
+        parameters={"bc_type": "fix_base"},
     )
 
     # Compute solution
@@ -83,7 +84,11 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
         with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
             xdmf.write_checkpoint(u, "u", float(i), dolfin.XDMFFile.Encoding.HDF5, True)
             xdmf.write_checkpoint(
-                von_Mises, "von_Mises", float(i), dolfin.XDMFFile.Encoding.HDF5, True
+                von_Mises,
+                "von_Mises",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
             )
             xdmf.write_checkpoint(
                 fiber_stress,
@@ -95,7 +100,6 @@ def solve(geo, pressures: tuple[float, ...], output: Path | str):
 
 
 def main():
-    psize_ref = 0.1
     outdir = Path("results_sphere_anisotropic")
 
     for radius in radii:
@@ -103,10 +107,9 @@ def main():
         geo = get_sphere_geometry(
             radius=radius,
             width=default_width,
-            psize_ref=psize_ref,
             fiber={"90-60": (90, -60)},
         )
-        output = outdir / f"radius{radius}_width{default_width}_psize{psize_ref}.xdmf"
+        output = outdir / f"radius{radius}_width{default_width}.xdmf"
         if output.is_file():
             continue
         solve(
@@ -120,10 +123,9 @@ def main():
         geo = get_sphere_geometry(
             radius=default_radius,
             width=width,
-            psize_ref=psize_ref,
             fiber={"90-60": (90, -60)},
         )
-        output = outdir / f"radius{default_radius}_width{width}_psize{psize_ref}.xdmf"
+        output = outdir / f"radius{default_radius}_width{width}.xdmf"
         if output.is_file():
             continue
         solve(
@@ -133,32 +135,19 @@ def main():
         )
 
 
-def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
+def postprocess_item(radius, width, outdir):
     geo = get_sphere_geometry(
         radius=radius,
         width=width,
-        psize_ref=psize_ref,
         fiber={"90-60": (90, -60)},
     )
     V = dolfin.FunctionSpace(geo.mesh, "DG", 1)
     von_Mises = dolfin.Function(V)
     Tf = dolfin.Function(V)
-
-    # dsendo = ufl.ds(
-    #     subdomain_data=geo.ffun,
-    #     domain=geo.mesh,
-    #     subdomain_id=geo.markers["ENDO"][0],
-    # )
-    # dsepi = ufl.ds(
-    #     subdomain_data=geo.ffun, domain=geo.mesh, subdomain_id=geo.markers["EPI"][0]
-    # )
     dx = ufl.dx(domain=geo.mesh)
-
-    # endoarea = dolfin.assemble(dolfin.Constant(1.0) * dsendo)
-    # epiarea = dolfin.assemble(dolfin.Constant(1.0) * dsepi)
     volume = dolfin.assemble(dolfin.Constant(1.0) * dx)
 
-    output = outdir / f"radius{radius}_width{width}_psize{psize_ref}.xdmf"
+    output = outdir / f"radius{radius}_width{width}.xdmf"
     if not output.is_file():
         return []
 
@@ -178,7 +167,7 @@ def postprocess_item(radius, width, outdir, psize_ref=psize_ref):
                     "width": width,
                     "von mises": avg_von_mises,
                     "fiber_stress": avg_Tf,
-                }
+                },
             )
     return data
 
@@ -227,5 +216,5 @@ def postprocess():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     postprocess()
