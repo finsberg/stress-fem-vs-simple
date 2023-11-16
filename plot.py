@@ -190,12 +190,15 @@ def plot_laplace(
         extra_label = f" (factor={factor})"
 
     if by == "radius":
+        assert hasattr(radius, "__len__")
+        assert hasattr(radius, "__getitem__")
+        assert hasattr(radius, "__iter__")
         if len(radius) > 0 and isinstance(radius[0], EllipsoidRadius):
             ax.plot(
-                [r.ratio for r in radius],
+                [r.ratio for r in radius if isinstance(r, EllipsoidRadius)],
                 laplace(
                     pressure=pressure,
-                    radius=[r.long for r in radius],
+                    radius=[r.long for r in radius if isinstance(r, EllipsoidRadius)],
                     width=width,
                     factor=factor,
                 ),
@@ -204,10 +207,10 @@ def plot_laplace(
                 label="Laplace (radius long)" + extra_label,
             )
             ax.plot(
-                [r.ratio for r in radius],
+                [r.ratio for r in radius if isinstance(r, EllipsoidRadius)],
                 laplace(
                     pressure=pressure,
-                    radius=[r.short for r in radius],
+                    radius=[r.short for r in radius if isinstance(r, EllipsoidRadius)],
                     width=width,
                     factor=factor,
                 ),

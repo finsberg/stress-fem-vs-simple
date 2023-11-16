@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools>=61.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "stress-fem-vs-simple"
 version = "0.3.0"
 dependencies = [
-    "h5py==3.9.0",  # Pin to same version that is allready installed in the docker image
+    "h5py==3.9.0",
     "cardiac-geometries>=0.11.0",
     "ldrb",
     "pandas",

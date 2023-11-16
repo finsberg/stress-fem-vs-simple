@@ -3,10 +3,7 @@ import ufl_legacy as ufl
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import matplotlib.pyplot as plt
 
-
-from utils import laplace
 import plot
 
 import mechanics
@@ -131,9 +128,9 @@ def main():
             radius=default_radius,
             width=width,
         )
-        output = (
-            outdir
-            / f"radius_long{default_radius.long}_radius_short{default_radius.short}_width{width}.xdmf"
+        output = outdir / (
+            f"radius_long{default_radius.long}_"
+            f"radius_short{default_radius.short}_width{width}.xdmf"
         )
         if output.is_file():
             continue

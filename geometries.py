@@ -117,9 +117,3 @@ def get_ellipsoid_geometry(
     cfun["fname"] = "cfun.xdmf"
     schema["cfun"] = cardiac_geometries.geometry.H5Path(**cfun)
     return cardiac_geometries.geometry.Geometry.from_folder(folder, schema=schema)
-
-
-if __name__ == "__main__":
-    # geo = get_sphere_geometry(radius=1.0, width=0.5, fiber=(0, 0))
-    # breakpoint()
-    get_ellipsoid_geometry(radius_long=1.5, radius_short=0.5, width=0.3)

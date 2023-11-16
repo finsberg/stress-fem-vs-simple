@@ -3,9 +3,7 @@ import ufl_legacy as ufl
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import matplotlib.pyplot as plt
 
-from utils import laplace
 import plot
 
 import mechanics
