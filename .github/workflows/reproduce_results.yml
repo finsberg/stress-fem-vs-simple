@@ -55,4 +55,5 @@ jobs:
             ./results_ellipsoid
             ./results_sphere_simple
             ./results_sphere_anisotropic
+            ./figures
           if-no-files-found: error

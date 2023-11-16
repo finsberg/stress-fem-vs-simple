@@ -50,7 +50,7 @@ kaleido==0.2.1
     # via stress-fem-vs-simple (pyproject.toml)
 ldrb==2023.4.0
     # via stress-fem-vs-simple (pyproject.toml)
-llvmlite==0.34.0
+llvmlite==0.40.1
     # via numba
 markdown-it-py==3.0.0
     # via rich
@@ -62,9 +62,11 @@ meshio==5.3.4
     # via cardiac-geometries
 nbformat==5.9.2
     # via stress-fem-vs-simple (pyproject.toml)
-numba==0.51.2
-    # via ldrb
-numpy==1.26.1
+numba==0.57.1
+    # via
+    #   ldrb
+    #   stress-fem-vs-simple (pyproject.toml)
+numpy==1.23.5
     # via
     #   cardiac-geometries
     #   fenics-plotly
@@ -145,6 +147,3 @@ wcwidth==0.2.10
     # via prompt-toolkit
 widgetsnbextension==4.0.9
     # via ipywidgets
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
