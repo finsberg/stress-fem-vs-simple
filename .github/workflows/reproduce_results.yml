@@ -45,6 +45,9 @@ jobs:
       - name: Run ellipsoid
         run: python3 ellipsoid.py
 
+      - name: Run pv_loop
+        run: python3 pv_loop.py
+
       - name: Upload artifact
         if: always()
         uses: actions/upload-artifact@v3
