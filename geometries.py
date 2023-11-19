@@ -112,6 +112,10 @@ def get_ellipsoid_geometry(
             fiber_angle_endo=90,
             fiber_angle_epi=-60,
         )
+    return load_geometry_from_folder(folder)
+
+
+def load_geometry_from_folder(folder):
     schema = cardiac_geometries.geometry.Geometry.default_schema()
     cfun = schema["cfun"]._asdict()
     cfun["fname"] = "cfun.xdmf"

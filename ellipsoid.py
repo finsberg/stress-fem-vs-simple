@@ -149,8 +149,13 @@ def postprocess_item(radius, width, outdir):
     V = dolfin.FunctionSpace(geo.mesh, "DG", 1)
     von_Mises = dolfin.Function(V)
     Tf = dolfin.Function(V)
-    dx = ufl.dx(domain=geo.mesh)
+    dx = ufl.dx(domain=geo.mesh, subdomain_data=geo.cfun)
     volume = dolfin.assemble(dolfin.Constant(1.0) * dx)
+    volumes = {
+        k: dolfin.assemble(dolfin.Constant(1.0) * dx(v[0]))
+        for k, v in geo.markers.items()
+        if v[1] == 3
+    }
 
     output = (
         outdir
@@ -161,6 +166,14 @@ def postprocess_item(radius, width, outdir):
 
     data = []
 
+    def filter_zero(a, b):
+        try:
+            value = a / b
+        except ZeroDivisionError:
+            value = 0.0
+
+        return value
+
     with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
         for i, p in enumerate(pressures):
             xdmf.read_checkpoint(von_Mises, "von_Mises", i)
@@ -169,17 +182,36 @@ def postprocess_item(radius, width, outdir):
             avg_von_mises = dolfin.assemble(von_Mises * dx) / volume
             avg_Tf = dolfin.assemble(Tf * dx) / volume
 
-            data.append(
-                {
-                    "radius": radius.ratio,
-                    "radius_long": radius.long,
-                    "radius_short": radius.short,
-                    "pressure": p,
-                    "width": width,
-                    "von mises": avg_von_mises,
-                    "fiber_stress": avg_Tf,
-                },
-            )
+            regional_von_mises = {
+                f"von_mises_{'_'.join(k.lower().split('-'))}": filter_zero(
+                    dolfin.assemble(von_Mises * dx(v[0])),
+                    volumes[k],
+                )
+                for k, v in geo.markers.items()
+                if v[1] == 3
+            }
+            regional_Tf = {
+                f"fiber_stress_{'_'.join(k.lower().split('-'))}": filter_zero(
+                    dolfin.assemble(Tf * dx(v[0])),
+                    volumes[k],
+                )
+                for k, v in geo.markers.items()
+                if v[1] == 3
+            }
+
+            item = {
+                "radius": radius.ratio,
+                "radius_long": radius.long,
+                "radius_short": radius.short,
+                "pressure": p,
+                "width": width,
+                "von mises": avg_von_mises,
+                "fiber_stress": avg_Tf,
+            }
+            item.update(regional_Tf)
+            item.update(regional_von_mises)
+            data.append(item)
+
     return data
 
 
@@ -205,8 +237,9 @@ def postprocess():
     ]
     df_width = df[(df["radius"] == default_radius.ratio) & (df["pressure"] == 0.3)]
     df_radius = df[(df["width"] == default_width) & (df["pressure"] == 0.3)]
+    plot.plot_regional_stresses(df_pressure)
 
-    return plot.plot_stress_curves(
+    plot.plot_stress_curves(
         df_pressure=df_pressure,
         df_width=df_width,
         df_radius=df_radius,
@@ -229,16 +262,16 @@ def postprocess():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     postprocess()
 
-    plot.plot_ellipsoid_geo(
-        radii=radii,
-        widths=widths,
-        default_width=default_width,
-        default_radius=default_radius,
-    )
-    plot.plot_aha(
-        default_width=default_width,
-        default_radius=default_radius,
-    )
+    # plot.plot_ellipsoid_geo(
+    #     radii=radii,
+    #     widths=widths,
+    #     default_width=default_width,
+    #     default_radius=default_radius,
+    # )
+    # plot.plot_aha(
+    #     default_width=default_width,
+    #     default_radius=default_radius,
+    # )

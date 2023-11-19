@@ -27,12 +27,18 @@ How well does the law of Laplace approximate the stresses in the heart (left ven
 
 ---
 
+## Why are we interested in stress?
+
+Increased wall stress -> remodeling -> HF
+
+---
+
 ## What is the law of Laplace
 
 The law of laplace states that
 
 $$
-\text{ws} = \frac{p \times r}{2 \times w}
+\text{ws} = \frac{p \times r}{2 \times w \left( 1 + \frac{w}{2r}\right)} \approx^{w \ll r} \frac{p \times r}{2 \times w}
 $$
 
 <p class="small-text">
@@ -43,16 +49,20 @@ Woods, Robert H. "A few applications of a physical theorem to membranes in the h
 
 ---
 
+![bg fit](figures/paper_title.png)
+![bg fit](figures/paper_result.png)
+
+---
+
 ## We can test this in a finite element model
 
 ![w:700 right](figures/sphere_stress_default.png)
 
 ---
 
-<!-- <style scoped>section { justify-content: start; }</style> -->
+
 We can also test this law using different radii
 
-<!-- By average the stress over the entire geometry -->
 
 ![bg contain vertical](figures/sphere_mesh_radius.png)
 ![bg fit](figures/sphere_radius_von_mises_only.png)
@@ -97,6 +107,9 @@ We orient a cube to so that fibers are aligned with one of the axes.
 
 ---
 
+<style scoped>section { justify-content: start; }</style>
+## Comparing circumferential stress with Laplace
+
 ![bg fit](figures/sphere_pressure_circ.png)
 ![bg fit](figures/sphere_radius_circ.png)
 ![bg fit](figures/sphere_width_circ.png)
@@ -106,6 +119,9 @@ We orient a cube to so that fibers are aligned with one of the axes.
 ![bg fit](figures/sphere_fibers.png)
 
 ---
+
+<style scoped>section { justify-content: start; }</style>
+## Comparing fiber stress with Laplace
 
 ![bg fit](figures/sphere_pressure_all.png)
 ![bg fit](figures/sphere_radius_all.png)
@@ -144,7 +160,6 @@ We can redo the analysis using ellipsoids with different widths and ratios betwe
 
 ---
 
-<!-- <style scoped>section { justify-content: start; }</style> -->
 We fix the radius along the short axis and vary the width and the long axis radius
 
 
@@ -163,8 +178,39 @@ We fix the radius along the short axis and vary the width and the long axis radi
 
 ---
 
+
+
 ## With FEM-based models we can alo compute the stresses in each AHA segment
 
 ![bg fit right](figures/ellipsoid_mesh_aha.png)
 
 ---
+
+![w:700 center](figures/regional_stress.png)
+
+---
+
+<style scoped>section { justify-content: start; }</style>
+## Laplace law does not take into account that the heart is contracting
+
+![bg fit](figures/pv_loop.png)
+![bg fit](figures/regional_stresses_contract.png)
+
+
+---
+
+## In summary
+
+* Laplace law is good for intuition about how pressure, wall thickness and radius is related to the wall stress
+* But, it does not capture
+  - anisotropy
+  - regional differences
+  - contributions from active contraction
+
+---
+
+## Things we could include (but probably will not have time)
+
+- Patient specific geometry
+- Scar tissue (spatially varying stiffness)
+- Other?

@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=64.4.0", "wheel", "pip>=22.3"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "stress-fem-vs-simple"
@@ -30,6 +30,9 @@ docs = [
     "jupytext",
     "sphinxcontrib-bibtex",
 ]
+
+[tool.setuptools]
+packages = []
 
 [tool.ruff]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.

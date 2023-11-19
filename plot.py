@@ -390,3 +390,42 @@ def plot_stress_curves(
     ax.set_xlabel(radius_xlabel)
     # ax.set_title(f"$w={default_width}$, $p=0.3$")
     plt.savefig(f"figures/{prefix}_radius_{postfix}.png")
+
+
+def plot_regional_stresses(df):
+    regions = [
+        k.replace("von_mises_", "") for k in df.keys() if k.startswith("von_mises_")
+    ]
+
+    fig, ax = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+    lines = []
+    x = df.pressure.to_numpy()
+    for r in regions:
+        ax[0].plot(x, df[f"von_mises_{r}"].to_numpy())
+        (l,) = ax[1].plot(x, df[f"fiber_stress_{r}"].to_numpy())
+        lines.append(l)
+
+    ax[0].plot(x, df["von mises"].to_numpy(), "k--")
+    (l,) = ax[1].plot(x, df["fiber_stress"].to_numpy(), "k--")
+    lines.append(l)
+
+    for axi in ax:
+        axi.set_yticks([])
+        axi.set_ylabel("Stress")
+    ax[0].set_title("Von Mises")
+    ax[1].set_title("Fiber stress")
+    ax[1].set_xticks(x)
+    ax[1].set_xticklabels(f"{xi:.2f}" for xi in x / x.max())
+    ax[1].set_xlabel("pressure / max pressure")
+    lgd = fig.legend(
+        lines,
+        regions + ["global"],
+        loc="center right",
+    )
+    fig.subplots_adjust(right=0.75)
+    fig.savefig(
+        "figures/regional_stress.png",
+        bbox_extra_artists=(lgd,),
+        bbox_inches="tight",
+    )
+    plt.close("all")
