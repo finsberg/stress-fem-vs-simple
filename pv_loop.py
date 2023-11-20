@@ -253,5 +253,5 @@ if __name__ == "__main__":
             geofolder,
             create_fibers=True,
         )
-    # main(geofolder=geofolder)
+    main(geofolder=geofolder)
     postprocess(geofolder=geofolder)

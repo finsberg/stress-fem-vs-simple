@@ -262,16 +262,16 @@ def postprocess():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     postprocess()
 
-    # plot.plot_ellipsoid_geo(
-    #     radii=radii,
-    #     widths=widths,
-    #     default_width=default_width,
-    #     default_radius=default_radius,
-    # )
-    # plot.plot_aha(
-    #     default_width=default_width,
-    #     default_radius=default_radius,
-    # )
+    plot.plot_ellipsoid_geo(
+        radii=radii,
+        widths=widths,
+        default_width=default_width,
+        default_radius=default_radius,
+    )
+    plot.plot_aha(
+        default_width=default_width,
+        default_radius=default_radius,
+    )
