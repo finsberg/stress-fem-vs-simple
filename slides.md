@@ -207,6 +207,10 @@ We fix the radius along the short axis and vary the width and the long axis radi
   - regional differences
   - contributions from active contraction
 
+* Slides and material
+  - Code and material: https://github.com/finsberg/stress-fem-vs-simple
+  - Slides: https://finsberg.github.io/stress-fem-vs-simple/
+
 ---
 
 ## Things we could include (but probably will not have time)

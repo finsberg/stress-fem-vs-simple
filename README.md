@@ -2,6 +2,12 @@
 
 Material from presentation given at *Seminar for researcher in Oslo with projects regarding myocardial work* at Oslo University hospital November 30th 2023
 
+## Slides
+
+You can find the slides at: https://finsberg.github.io/stress-fem-vs-simple/
+
+
+
 ## Create slides
 Slides are in Markdown and converted to HTML using [`marp`](https://marp.app) and the command
 ```
