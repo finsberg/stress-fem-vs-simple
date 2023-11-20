@@ -133,7 +133,7 @@ We orient a cube to so that fibers are aligned with one of the axes.
 
 In the calculations so far we have assumed that the heart is linear elastic, isotropic and undergoes small deformation (e.g steel). However, the myocardium is nonlinear, anisotropic and undergoes large deformations.
 
-![bg right:40% fit](figures/microstructure.png)
+![bg right:60% fit](figures/microstructure.png)
 
 ---
 
