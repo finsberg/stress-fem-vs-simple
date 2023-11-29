@@ -108,6 +108,7 @@ def main(geofolder):
 
         devT = T - (1 / 3) * ufl.tr(T) * ufl.Identity(3)
         fiber_stress = dolfin.project(ufl.inner(devT * f, f), W)
+        det = dolfin.project(J, W)
 
         with dolfin.XDMFFile(Path(output).with_suffix(".xdmf").as_posix()) as xdmf:
             xdmf.write_checkpoint(u, "u", float(i), dolfin.XDMFFile.Encoding.HDF5, True)
@@ -121,6 +122,13 @@ def main(geofolder):
             xdmf.write_checkpoint(
                 fiber_stress,
                 "fiber_stress",
+                float(i),
+                dolfin.XDMFFile.Encoding.HDF5,
+                True,
+            )
+            xdmf.write_checkpoint(
+                det,
+                "det",
                 float(i),
                 dolfin.XDMFFile.Encoding.HDF5,
                 True,

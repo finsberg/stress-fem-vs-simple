@@ -8,6 +8,9 @@ style: |
   .small-text {
     font-size: 0.55rem;
   }
+  video::-webkit-media-controls {
+    will-change: transform;
+  }
 html: true
 marp: true
 ---
@@ -25,15 +28,25 @@ November 30th 2023
 
 How well does the law of Laplace approximate the stresses in the heart (left ventricle)
 
----
-
-## Why are we interested in stress?
-
-Increased wall stress -> remodeling -> HF
+* and what can we gain from a using a finite element-based model
 
 ---
 
-## What is the law of Laplace
+
+![bg fit](figures/paper_title.png)
+![bg fit](figures/paper_result.png)
+
+---
+
+The law of Laplace does not take into account
+
+- regional differences
+- anisotropy (myocardium behaves differently in fiber and cross fiber direction)
+
+
+---
+
+## What is the law of Laplace?
 
 The law of laplace states that
 
@@ -49,8 +62,20 @@ Woods, Robert H. "A few applications of a physical theorem to membranes in the h
 
 ---
 
-![bg fit](figures/paper_title.png)
-![bg fit](figures/paper_result.png)
+## How can we use the Law of Laplace?
+
+- Hypertension → ↑ pressure → ↑ wall stress
+
+- Concentric hypertrophy → ↑ wall thickness → ↓  wall stress
+
+* So the heart can compensate increased wall stress by thickening the wall
+* Increased wall stress  → remodeling  → heart failure
+
+---
+
+## The finite element method (FEM) is a way to solve equations on complex geometries
+
+![w:700 center](figures/fem.png)
 
 ---
 
@@ -129,7 +154,7 @@ We orient a cube to so that fibers are aligned with one of the axes.
 
 ---
 
-## The myocardium is anisotropic
+## The myocardium is nonlinear and anisotropic
 
 In the calculations so far we have assumed that the heart is linear elastic, isotropic and undergoes small deformation (e.g steel). However, the myocardium is nonlinear, anisotropic and undergoes large deformations.
 
@@ -188,14 +213,23 @@ We fix the radius along the short axis and vary the width and the long axis radi
 
 ![w:700 center](figures/regional_stress.png)
 
----
+<!-- ---
 
 <style scoped>section { justify-content: start; }</style>
 ## Laplace law does not take into account that the heart is contracting
 
 ![bg fit](figures/pv_loop.png)
 ![bg fit](figures/regional_stresses_contract.png)
+ -->
 
+---
+
+## In FEM we can fit clinical data to patient specific geometries
+
+<video width="900" autoplay loop muted playsinline>
+  <source src="https://github.com/finsberg/stress-fem-vs-simple/raw/main/figures/patient_stress.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
 
 ---
 
@@ -205,7 +239,7 @@ We fix the radius along the short axis and vary the width and the long axis radi
 * But, it does not capture
   - anisotropy
   - regional differences
-  - contributions from active contraction
+* Models based on finite element method can be fitted to clinical data which allows for patient-specific stress estimations
 
 * Slides and material
   - Code and material: https://github.com/finsberg/stress-fem-vs-simple
