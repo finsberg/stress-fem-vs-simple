@@ -9,7 +9,7 @@ repos:
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ['--maxkb=1400']
       - id: check-toml
 
   - repo: https://github.com/asottile/add-trailing-comma
