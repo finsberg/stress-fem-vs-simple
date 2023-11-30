@@ -17,10 +17,14 @@ marp: true
 
 # From the Law of Laplace to FEM-based stress estimation
 
-Henrik Finsberg
-Work seminar
-November 30th 2023
+Cardiac-Work seminar
+Rikshopitalet, November 30th 2023
 
+Henrik Finsberg
+*Senior Research Engineer*
+*Simula Research Laboratory*
+
+![w:150](figures/logo.png)
 
 ---
 
